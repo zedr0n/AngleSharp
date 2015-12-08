@@ -21,8 +21,12 @@
 
         static readonly String _version = typeof(HttpRequester).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version;
         static readonly String _agentName = "AngleSharp/" + _version;
-        static readonly Dictionary<String, PropertyInfo> _propCache;
-        static readonly List<String> _restricted;
+
+        [ThreadStatic] private static Dictionary<String, PropertyInfo> _propCache;
+        public static Dictionary<String, PropertyInfo> PropCache => _propCache ?? (_propCache = new Dictionary<string, PropertyInfo>());
+        
+        [ThreadStatic] private static List<String> _restricted;
+        public static List<String> Restricted => _restricted ?? (_restricted = new List<string>());
 
         #endregion
 
@@ -37,8 +41,8 @@
 
         static HttpRequester()
         {
-            _propCache = new Dictionary<String, PropertyInfo>();
-            _restricted = new List<String>();
+            //_propCache = new Dictionary<String, PropertyInfo>();
+            //_restricted = new List<String>();
         }
 
         /// <summary>
@@ -242,18 +246,18 @@
             /// </param>
             void SetProperty(String name, Object value)
             {
-                if (!_propCache.ContainsKey(name))
+                if (!PropCache.ContainsKey(name))
                 {
 #if !SILVERLIGHT
-                    _propCache.Add(name, _http.GetType().GetTypeInfo().GetDeclaredProperty(name));
+                    PropCache.Add(name, _http.GetType().GetTypeInfo().GetDeclaredProperty(name));
 #else
-                    _propCache.Add(name, _http.GetType().GetProperty(name));
+                    PropCache.Add(name, _http.GetType().GetProperty(name));
 #endif
                 }
 
-                var property = _propCache[name];
+                var property = PropCache[name];
 
-                if (!_restricted.Contains(name) && property != null && property.CanWrite)
+                if (!Restricted.Contains(name) && property != null && property.CanWrite)
                 {
                     try
                     {
@@ -263,7 +267,7 @@
                     catch
                     {
                         //Catch any failure and do not try again on the same platform
-                        _restricted.Add(name);
+                        Restricted.Add(name);
                     }
                 }
             }
