@@ -1,4 +1,6 @@
-﻿namespace AngleSharp.Dom.Html
+﻿using System.Threading.Tasks;
+
+namespace AngleSharp.Dom.Html
 {
     using AngleSharp.Attributes;
     using AngleSharp.Dom.Css;
@@ -108,7 +110,7 @@
         /// Simulates a mouse click on an element.
         /// </summary>
         [DomName("click")]
-        void DoClick();
+        Task<IDocument> DoClick();
 
         /// <summary>
         /// Puts the keyboard focus on the given element.

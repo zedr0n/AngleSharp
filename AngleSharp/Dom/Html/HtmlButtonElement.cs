@@ -1,4 +1,6 @@
-﻿namespace AngleSharp.Dom.Html
+﻿using System.Threading.Tasks;
+
+namespace AngleSharp.Dom.Html
 {
     using AngleSharp.Extensions;
     using AngleSharp.Html;
@@ -117,19 +119,16 @@
 
         #region Methods
 
-        public override void DoClick()
+        public override async Task<IDocument> DoClick()
         {
-            var form = Form;
+            if (IsClickedCancelled() != false || Form == null) return Owner;
 
-            if (IsClickedCancelled() == false && form != null)
-            {
-                var type = Type;
+            if (Type.Is(InputTypeNames.Submit))
+                return await Form.Submit(this);
+            else if (Type.Is(InputTypeNames.Reset))
+                Form.Reset();
 
-                if (type.Is(InputTypeNames.Submit))
-                    form.Submit(this);
-                else if (type.Is(InputTypeNames.Reset))
-                    form.Reset();
-            }
+            return Owner;
         }
 
         #endregion

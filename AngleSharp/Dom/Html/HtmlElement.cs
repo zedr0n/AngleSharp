@@ -1,4 +1,7 @@
-﻿namespace AngleSharp.Dom.Html
+﻿using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+
+namespace AngleSharp.Dom.Html
 {
     using AngleSharp.Dom.Collections;
     using AngleSharp.Dom.Css;
@@ -237,9 +240,11 @@
             //Provide additional information on the Text Nodes which words (if any) have errors.
         }
 
-        public virtual void DoClick()
+        public virtual async Task<IDocument> DoClick()
         {
             IsClickedCancelled();
+            await Task.Yield();
+            return Owner;
         }
 
         public virtual void DoFocus()
